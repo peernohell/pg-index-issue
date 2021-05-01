@@ -1,0 +1,11 @@
+#!/bin/bash
+source ./env
+
+if [ ! "$(docker ps -q -f name=$DOCKER_NAME)" ]; then
+    if [ "$(docker ps -aq -f status=exited -f name=$DOCKER_NAME)" ]; then
+        # cleanup
+        docker rm $DOCKER_NAME
+    fi
+    # run your container
+    docker run -d --name $DOCKER_NAME --restart unless-stopped -p 127.0.0.1:$PGPORT:5432 -e POSTGRES_PASSWORD=$PGPASSWORD -e POSTGRES_DB=$POSTGRES_DB -v /tmp:/tmp -v $POSTGRES_DIR:/var/lib/postgresql/data timescale/timescaledb:2.0.1-pg12
+fi

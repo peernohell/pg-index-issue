@@ -1,0 +1,12 @@
+POSTGRES_DIR=$PWD/data
+POSTGRES_DB=pg_index_issue
+PGPORT=5433
+
+DOCKER_NAME=pg-index-issue
+
+# for node-postgress module
+# PGHOST='localhost'
+PGUSER=postgres
+PGDATABASE=$POSTGRES_DB
+PGPASSWORD=postgres
+PGPORT=5432

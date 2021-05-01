@@ -1,0 +1,56 @@
+#!/bin/bash
+
+source ./env
+
+NL="\n---------------------------------------------------------------------------------\n\n"
+
+docker -v
+if [ $? -eq 127 ]; then
+   echo Please install Docker https://docs.docker.com/docker-for-mac/install/
+   exit 1
+fi
+
+if [ -d "${POSTGRES_DIR}" ]; then
+  echo "Creating ${POSTGRES_DIR}${NL}"
+  mkdir $POSTGRES_DIR
+fi
+
+
+echo "\nStart postgres ${NL}"
+./run
+
+# wait db to starting up
+echo "\nWait postgres to be available${NL}"
+until docker exec -i $DOCKER_NAME psql -U $PGUSER -d "$POSTGRES_DB" -c "\dt" &> /dev/null
+do
+  echo "wait..."
+  sleep 1
+done
+
+echo Create pg table
+docker exec -i $DOCKER_NAME psql -v ON_ERROR_STOP=1 -U $PGUSER -d "$POSTGRES_DB" <<-EOSQL
+
+CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
+
+SET NAMES 'utf8';
+DROP TABLE IF EXISTS "activities";
+CREATE TABLE "activities" (
+    "_id" CHAR(21) NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL,
+    "extra" JSONB,
+    PRIMARY KEY ("_id", "createdAt")
+);
+
+SELECT create_hypertable('activities', 'createdAt');
+
+CREATE INDEX activities_info on activities ((extra->>'info'));
+
+EOSQL
+
+
+# install npm dependency
+npm install
+
+# generate data
+node index.mjs
+

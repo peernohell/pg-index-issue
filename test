@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source ./env
+
+
+echo explain select should use index on extra->>'info'
+
+docker exec -i $DOCKER_NAME psql -v ON_ERROR_STOP=1 -U $PGUSER -d "$POSTGRES_DB" <<-EOSQL
+EXPLAIN SELECT "_id", (extra->>'info') as info FROM activities WHERE extra->>'info' = 'ASDFASDF';
+EOSQL

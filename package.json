@@ -1,0 +1,14 @@
+{
+  "name": "pg-index-issue",
+  "version": "1.0.0",
+  "description": "This project showcase an issue we have with indexing pg db.  We use [Timescale DB](https://www.timescale.com/) and try to add an index on a jsonb field \"info\" We use docker to start the database. It will be setup by the init script. It will also run the ./generate-csv.js script.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^8.6.0"
+  }
+}
