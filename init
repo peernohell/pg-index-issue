@@ -37,13 +37,18 @@ DROP TABLE IF EXISTS "activities";
 CREATE TABLE "activities" (
     "_id" CHAR(21) NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL,
+    "info" TEXT,
     "extra" JSONB,
     PRIMARY KEY ("_id", "createdAt")
 );
 
 SELECT create_hypertable('activities', 'createdAt');
 
-CREATE INDEX activities_info on activities ((extra->>'info'));
+CREATE INDEX activities_info on activities (info);
+
+-- CREATE INDEX activities_extra_info on activities ((extra->>'info')); -- OK
+CREATE INDEX activities_extra_info on activities ((extra->>'info')) WHERE extra ? 'messageId'; -- NOT OK
+-- CREATE INDEX activities_extra_info on activities ((extra->>'info')) WHERE (extra->>'messageId') is not null; -- NOT OK
 
 EOSQL
 
